@@ -30,7 +30,7 @@ git clone https://github.com/RobotiXX/Verti-Wheelers.git
 cd catkin_ws; rosdep install --from-paths . --ignore-src --rosdistro=noetic
 ```
 
-*Install Azure Kinect Sensor SDK on Ubuntu 20.04+ (Current Sensor SDK only supports for Ubuntu 18.04)
+*Install Azure Kinect Sensor SDK on Ubuntu 20.04+ (Current Sensor SDK only supports for Ubuntu 18.04)* :
 ```
 1. Downlaod the [k4a-tools](https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/k/k4a-tools/) 1.4.1amd64.deb file.
 2. Download the [libk4a and libk4a-dev](https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/libk/) libk4a1.4 and libk4a1.4-dev files.
