@@ -55,6 +55,6 @@ In terminal 2: cd catkin_ws/src/navstack_pub/src; python3 action_generator.py
 ```
 ### Sample trained model can be found here
 
-> https://github.com/RobotiXX/Verti-Wheelers/blob/main/navstack_pub/src/model_big_good.pt
-> https://github.com/RobotiXX/Verti-Wheelers/blob/main/navstack_pub/src/model_small_good.pt
+> [Sample trained Model](https://github.com/RobotiXX/Verti-Wheelers/blob/main/navstack_pub/src/model_big_good.pt)
+
 
