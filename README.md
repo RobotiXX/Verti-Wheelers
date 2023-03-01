@@ -10,7 +10,7 @@
 
 > Torchvision
 
-> Arduino [Arduino Mega 2560] (https://docs.arduino.cc/software/ide-v1/tutorials/Linux).
+> Arduino [Arduino Mega 2560](https://docs.arduino.cc/software/ide-v1/tutorials/Linux).
 
 > Python 3.8.10.
 
