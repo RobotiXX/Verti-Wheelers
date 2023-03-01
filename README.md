@@ -35,20 +35,27 @@ cd catkin_ws; rosdep install --from-paths . --ignore-src --rosdistro=noetic
 ```
 cd catkin_ws; catkin build; source devel/setup.bash
 ```
-### Launch the Wheelers
+### To Launch the Wheelers ROS Network
+
+```
+In terminal 1: roslaunch navstack_pub runCAR.launch
+```
+
+### To Launch the Three Different Algorithms
 
 ```
 Open_loop launch:
-In terminal 1: roslaunch navstack_pub runCAR.launch
 In terminal 2: roslaunch navstack_pub open_loop.launch
 
 Rule_based launch:
-In terminal 1: roslaunch navstack_pub runCAR.launch
 In terminal 2: roslaunch navstack_pub rule_based.launch
 
-Behavior cloning launch:
-In terminal 1: roslaunch navstack_pub runCAR.launch
+Neural Network Behavior cloning launch:
 In terminal 2: cd catkin_ws/src/navstack_pub/src; python3 action_generator.py
+```
+### Sample trained model can be found here
 
-
-
+```
+https://github.com/RobotiXX/Verti-Wheelers/blob/main/navstack_pub/src/model_big_good.pt
+https://github.com/RobotiXX/Verti-Wheelers/blob/main/navstack_pub/src/model_small_good.pt
+```
