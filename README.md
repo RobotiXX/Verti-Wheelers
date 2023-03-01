@@ -14,7 +14,7 @@
 
 > Python 3.8.10.
 
-> RGBD camera driver [Azure Kinect Camera](https://github.com/microsoft/Azure_Kinect_ROS_Driver).
+> RGBD Camera Driver [Azure Kinect Camera](https://github.com/microsoft/Azure_Kinect_ROS_Driver).
 
 ### Create a workspace and clone sources
 
