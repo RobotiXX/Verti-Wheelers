@@ -8,11 +8,11 @@
 
 > PyTorch.
 
+> Torchvision
+
 > Arduino [Arduino Mega 2560] (https://docs.arduino.cc/software/ide-v1/tutorials/Linux).
 
 > Python 3.8.10.
-
-> PS4 Controller driver [Ds4](http://wiki.ros.org/ds4_driver).
 
 > RGBD camera driver [Azure Kinect Camera](https://github.com/microsoft/Azure_Kinect_ROS_Driver).
 
@@ -22,7 +22,6 @@
 mkdir -p catkin_ws/src; cd catkin_ws/src; catkin_init_workspace
 git clone https://github.com/microsoft/Azure_Kinect_ROS_Driver
 git clone https://github.com/microsoft/Azure-Kinect-Sensor-SDK
-Open a new terminal: sudo pip install ds4drv; sudo ds4drv
 git clone https://github.com/RobotiXX/Verti-Wheelers.git
 ```
 
