@@ -1,4 +1,4 @@
-# [Verti-Wheeler](https://cs.gmu.edu/~xiao/Research/Verti-Wheelers/): Verti 4 Wheelers(V4W) and Verti 6 Wheelers(V6W) Installation.
+# [Verti-Wheelers](https://cs.gmu.edu/~xiao/Research/Verti-Wheelers/): Verti 4 Wheeler(V4W) and Verti 6 Wheeler(V6W) Installation.
 
 ![Suite image](https://github.com/RobotiXX/Verti-Wheelers/blob/main/Verti%20Wheelers.jpg)
 
