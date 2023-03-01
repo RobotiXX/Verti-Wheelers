@@ -1,0 +1,100 @@
+<launch>
+
+	<arg name="gui" default="False" />
+	<param name="robot_description" textfile="/home/robotixx/crawlingcar_ws/src/Cherry-Autonomous-Racecar/urdf/car.urdf" />
+	<param name="use_gui" value="$(arg gui)"/>
+	
+	<!--node name="rviz" pkg="rviz" type="rviz" args="-d $(find urdf_tutorial)/urdf.rviz" required="true" -->
+
+    
+
+    <node pkg ="car" type ="cmdControl.py" name ="cmdController"/>
+
+  <node pkg="joy" type="joy_node" name="joystick" >
+    <param name="deadzone" value="0.0" />
+  </node>
+  
+  <node pkg="rosserial_python" type="serial_node.py" name="teensy">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="57600"/>
+  </node>
+
+
+   
+  <param name="robot_description"
+    command="xacro $(find azure_kinect_ros_driver)/urdf/azure_kinect.urdf.xacro" />
+
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+
+  <!-- Start the K4A sensor driver -->
+  <group ns="k4a" >
+
+    <!-- Spawn a nodelet manager -->
+    <node pkg="nodelet" type="nodelet" name="manager" args="manager" output="screen">
+      <param name="num_worker_threads" value="16" />
+    </node>
+
+    <!-- Spawn an image_proc/rectify nodelet to rectify the RGB image -->
+    <node pkg="nodelet" type="nodelet" name="rectify_rgb"
+          args="load image_proc/rectify manager --no-bond"
+          respawn="true">
+      <remap from="image_mono"  to="rgb_to_depth/image_raw" />
+      <remap from="image_rect"  to="rgb_to_depth/image_rect" />
+    </node>
+
+    <!-- Spawn an image_proc/rectify nodelet to rectify the depth image -->
+    <node pkg="nodelet" type="nodelet" name="rectify_depth"
+          args="load image_proc/rectify manager --no-bond"
+          respawn="true">
+      <remap from="image_mono"  to="depth/image_raw" />
+      <remap from="image_rect"  to="depth/image_rect" />
+    </node>
+
+    <node pkg="nodelet" type="nodelet" name="k4a_ros_bridge"
+          args="load Azure_Kinect_ROS_Driver/K4AROSBridgeNodelet manager --no-bond"
+          respawn="true">
+      <param name="depth_enabled"     value="true" />
+      <param name="depth_mode"        value="NFOV_UNBINNED" />
+      <param name="color_enabled"     value="true" />
+      <param name="color_resolution"  value="720P" />
+      <param name="fps"               value="30" />
+      <param name="point_cloud"       value="false" />
+      <param name="rgb_point_cloud"   value="false" />
+      <param name="required"          value="true" />
+      <param name="imu_rate_target"   value="100" />
+
+    </node>
+
+  </group>
+
+  <!-- Start rtabmap_ros node -->
+  <include file="$(find rtabmap_ros)/launch/rtabmap.launch" ns="rtabmap" >
+    <arg name="rgb_topic"          value="/k4a/rgb_to_depth/image_rect" />
+    <arg name="depth_topic"        value="/k4a/depth/image_rect" />
+    <arg name="camera_info_topic"  value="/k4a/depth/camera_info" />
+    <arg name="approx_sync"        value="true" />
+    <arg name="frame_id"           value="camera_base" />
+    <arg name="args"               value="--delete_db_on_start --Odom/ResetCountdown 2" />
+  </include>
+  
+ 
+
+ <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+
+  <rosparam file="$(find navstack_pub)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+  <rosparam file="$(find navstack_pub)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+
+  <rosparam file="$(find navstack_pub)/param/global_costmap_params.yaml" command="load" />
+  <rosparam file="$(find navstack_pub)/param/local_costmap_params.yaml" command="load" />
+
+  <rosparam file="$(find navstack_pub)/param/base_local_planner_params.yaml" command="load" />
+  <rosparam file="$(find navstack_pub)/param/move_base_params.yaml" command="load" />
+
+  <param name="base_global_planner" type="string" value="navfn/NavfnROS" />
+  <param name="base_local_planner" value="teb_local_planner/TebLocalPlannerROS"/>
+
+  <remap from="odom" to="odometry/filtered" />
+ </node>
+
+</launch>

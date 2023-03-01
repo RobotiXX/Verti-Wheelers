@@ -1,0 +1,3 @@
+<launch>
+	<node name="rule_based" pkg="navstack_pub" type="rule_based.py"/>
+</launch>
