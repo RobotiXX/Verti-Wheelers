@@ -53,10 +53,11 @@ In terminal 2: roslaunch navstack_pub rule_based.launch
 Neural Network Behavior cloning launch:
 In terminal 2: cd catkin_ws/src/navstack_pub/src; python3 action_generator.py
 ```
-### Sample trained model can be found here
+### Pytorch implementaion of the CNN from End to End Learning for Verti Wheelers
+
 
 > [Sample trained Model](https://github.com/RobotiXX/Verti-Wheelers/blob/main/navstack_pub/src/model_big_good.pt)
 
-> All the datasets can be found here [Dataverse](https://dataverse.orc.gmu.edu/dataset.xhtml?persistentId=doi:10.13021/orc2020/QSN50Q)
+> All the sample datasets can be found here [Dataverse](https://dataverse.orc.gmu.edu/dataset.xhtml?persistentId=doi:10.13021/orc2020/QSN50Q)
 
 
