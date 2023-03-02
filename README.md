@@ -1,4 +1,4 @@
-# [Verti-Wheelers](https://cs.gmu.edu/~xiao/Research/Verti-Wheelers/): Verti 4 Wheeler(V4W) and Verti 6 Wheeler(V6W) Installation Guidance.
+# [Verti-Wheelers](https://cs.gmu.edu/~xiao/Research/Verti-Wheelers/): Verti-4-Wheeler (V4W) and Verti-6-Wheeler (V6W) Installation Guidance
 
 ![Suite image](https://github.com/RobotiXX/Verti-Wheelers/blob/main/Verti%20Wheelers.jpg)
 
@@ -32,7 +32,7 @@ cd catkin_ws; rosdep install --from-paths . --ignore-src --rosdistro=noetic
 
 *Install Azure Kinect Sensor SDK on Ubuntu 20.04+ (Current Sensor SDK only supports for Ubuntu 18.04)* :
 > 1. Downlaod the [k4a-tools 1.4.1amd64.deb](https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/k/k4a-tools/) file.
-> 2. Download the [libk4a1.4 and libk4a1.4-dev](https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/libk/) files.
+> 2. Download the [libk4a1.4][libk4a1.4-dev](https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/libk/) files.
 > 3. Install SDK.
 > 4. Create a new file: sudo gedit /etc/udev/rules.d/99-k4a.rules, add the contents as below:
 ```
@@ -58,7 +58,7 @@ LABEL="k4a_logic_rules_end"
 ```
 cd catkin_ws; catkin build; source devel/setup.bash
 ```
-### To Launch the Wheelers ROS Network
+### To Launch the Verti-Wheelers' ROS Network
 
 ```
 In terminal 1: roslaunch navstack_pub runCAR.launch
@@ -76,13 +76,13 @@ In terminal 2: roslaunch navstack_pub rule_based.launch
 Neural Network Behavior cloning launch:
 In terminal 2: cd catkin_ws/src/navstack_pub/src; python3 action_generator.py
 ```
-### Pytorch implementaion of the CNN from End to End Learning for Verti Wheelers
+### Pytorch Model of the End-to-End Learning-Based Controller
 
 
-> [Sample trained Model](https://github.com/RobotiXX/Verti-Wheelers/blob/main/navstack_pub/src/model_big_good.pt)
+> [Trained Model](https://github.com/RobotiXX/Verti-Wheelers/blob/main/navstack_pub/src/model_big_good.pt)
 
-> All the sample datasets can be found here [Dataverse](https://dataverse.orc.gmu.edu/dataset.xhtml?persistentId=doi:10.13021/orc2020/QSN50Q)
+> All training data can be found at [GMU Dataverse](https://dataverse.orc.gmu.edu/dataset.xhtml?persistentId=doi:10.13021/orc2020/QSN50Q)
 
 
-### Verti Wheelers Control for PS4 Controller
+### Verti-Wheelers Control Interface with PS4 Controller
 ![Suite image](https://github.com/RobotiXX/Verti-Wheelers/blob/main/Joystick%20control.jpg)
