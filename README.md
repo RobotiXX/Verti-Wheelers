@@ -32,7 +32,7 @@ cd catkin_ws; rosdep install --from-paths . --ignore-src --rosdistro=noetic
 
 *Install Azure Kinect Sensor SDK on Ubuntu 20.04+ (Current Sensor SDK only supports for Ubuntu 18.04)* :
 > 1. Downlaod the [k4a-tools 1.4.1amd64.deb](https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/k/k4a-tools/) file.
-> 2. Download the [libk4a1.4][libk4a1.4-dev](https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/libk/) files.
+> 2. Download the [libk4a1.4](https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/libk/) [libk4a1.4-dev](https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/libk/) files.
 > 3. Install SDK.
 > 4. Create a new file: sudo gedit /etc/udev/rules.d/99-k4a.rules, add the contents as below:
 ```
