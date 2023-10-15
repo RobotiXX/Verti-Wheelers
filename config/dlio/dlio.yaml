@@ -1,0 +1,46 @@
+###########################################################
+#                                                         #
+# Copyright (c)                                           #
+#                                                         #
+# The Verifiable & Control-Theoretic Robotics (VECTR) Lab #
+# University of California, Los Angeles                   #
+#                                                         #
+# Authors: Kenny J. Chen, Ryan Nemiroff, Brett T. Lopez   #
+# Contact: {kennyjchen, ryguyn, btlopez}@ucla.edu         #
+#                                                         #
+###########################################################
+
+dlio:
+
+  version: 1.1.1
+
+  adaptive: true
+
+  pointcloud:
+    deskew: true
+    voxelize: true
+
+  imu:
+    calibration: true
+    intrinsics:
+      accel:
+        bias: [ 0.0, 0.0, 0.0 ]
+        sm:   [ 1.,  0.,  0.,
+                0.,  1.,  0.,
+                0.,  0.,  1. ]
+      gyro:
+        bias: [ 0.0, 0.0, 0.0 ]
+
+  extrinsics:
+    baselink2imu:
+      t: [ -0.0509907, -0.00349825, 0.00307388 ]
+      R: [ -0.9999884,  0.0030705, 0.0037129,
+           0.0030829,  0.9999897,  0.0033248,
+           -0.0037026,  0.0033362, -0.9999876 ]
+  
+  
+    baselink2lidar:
+      t: [ 0.,  0.,  0.0018 ]
+      R: [ -0.0000000, -0.1045285,  0.9945219,
+           -1.0000000, -0.0000000,  0.0000000,
+           0.0000000, -0.9945219, -0.1045285 ]

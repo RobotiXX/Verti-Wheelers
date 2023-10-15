@@ -1,0 +1,91 @@
+<launch>
+	
+  <!-- Load URDF -->
+  <param name="robot_description" command="cat $(find navstack_pub)/urdf/car.urdf" />
+
+  <!-- Spawn Robot Model -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+  <!-- Joint State Publisher GUI -->
+  <!-- node name="joint_state_publisher" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui"/ -->
+
+  <node pkg="joy" type="joy_node" name="joystick" >
+    <param name="deadzone" value="0.0" />
+  </node>
+
+  <node pkg ="navstack_pub" type ="cmdControl.py" name ="cmdController"/>
+
+  <node pkg="rosserial_python" type="serial_node.py" name="teensy">
+    <param name="port" value="/dev/ttyACM0"/>
+    <param name="baud" value="57600"/>
+  </node>
+  
+  
+  
+  <!--arg name="robot_namespace" default="robot"/-->
+  <arg name="rviz" default="false"/>
+  
+  <include file="$(find azure_kinect_ros_driver)/launch/driver.launch">
+    <arg name="point_cloud" value="true"/>
+    <arg name="rgb_point_cloud" value="false"/>
+    <arg name="fps" value="30"/>
+  </include>
+  
+  <!-- compute IMU quaternion -->
+  <node pkg="imu_filter_madgwick" type="imu_filter_node" name="imu_filter_node">
+    <param name="use_mag" value="false" />
+    <param name="publish_tf" value="false" />
+    <param name="world_frame" value="enu" />
+    <remap from="/imu/data_raw" to="/imu" />
+    <remap from="/imu/data" to="/imu_filter" />
+  </node>
+
+  <arg name="pointcloud_topic" default="/points2"/>
+  <arg name="imu_topic" default="/imu_filter"/>
+
+  <!-- DLIO Odometry Node -->
+  <node name="dlio_odom" pkg="direct_lidar_inertial_odometry" type="dlio_odom_node" output="screen" clear_params="true">
+
+    <!-- Load parameters -->
+    <rosparam file="$(find direct_lidar_inertial_odometry)/cfg/dlio.yaml" command="load"/>
+    <rosparam file="$(find direct_lidar_inertial_odometry)/cfg/params.yaml" command="load"/>
+
+    <!-- Subscriptions -->
+    <remap from="~pointcloud" to="$(arg pointcloud_topic)"/>
+    <remap from="~imu" to="$(arg imu_topic)"/>
+
+    <!-- Publications -->
+    <remap from="~odom"     to="dlio/odom_node/odom"/>
+    <remap from="~pose"     to="dlio/odom_node/pose"/>
+    <remap from="~path"     to="dlio/odom_node/path"/>
+    <remap from="~kf_pose"  to="dlio/odom_node/keyframes"/>
+    <remap from="~kf_cloud" to="dlio/odom_node/pointcloud/keyframe"/>
+    <remap from="~deskewed" to="dlio/odom_node/pointcloud/deskewed"/>
+
+  </node>
+
+  <!-- DLIO Mapping Node -->
+  <node name="dlio_map" pkg="direct_lidar_inertial_odometry" type="dlio_map_node" output="screen" clear_params="true">
+
+    <!-- Load parameters -->
+    <rosparam file="$(find direct_lidar_inertial_odometry)/cfg/dlio.yaml" command="load"/>
+    <rosparam file="$(find direct_lidar_inertial_odometry)/cfg/params.yaml" command="load"/>
+
+    <!-- Subscriptions -->
+    <remap from="~keyframes" to="dlio/odom_node/pointcloud/keyframe"/>
+
+    <!-- Publications -->
+    <remap from="~map" to="dlio/map_node/map"/>
+
+  </node>
+  
+  <!-- Elevation mapping node -->
+  <env name="PYTHONPATH" value="/home/jetson/.local/lib/python3.8/site-packages:$(env PYTHONPATH)" />
+  <node pkg="elevation_mapping_cupy" type="elevation_mapping_node" name="elevation_mapping" output="screen">
+    <rosparam command="load" file="$(find elevation_mapping_cupy)/config/parameters.yaml" />
+  </node>
+
+  <!-- RViz -->
+  <node pkg="rviz" type="rviz" name="dlio_rviz" args="-d $(find direct_lidar_inertial_odometry)/launch/dlio.rviz" if="$(arg rviz)"/>
+
+</launch>
