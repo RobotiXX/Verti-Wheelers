@@ -16,6 +16,10 @@
 
 > RGBD Camera Driver [Azure Kinect Camera](https://github.com/microsoft/Azure_Kinect_ROS_Driver).
 
+> Direct LiDAR-Inertial Odometry (https://github.com/vectr-ucla/direct_lidar_inertial_odometry.git).
+
+> Elevation Mapping cupy (https://github.com/leggedrobotics/elevation_mapping_cupy.git) 
+
 ### Create a workspace and clone sources
 
 ```
@@ -52,6 +56,7 @@ ATTRS{idVendor}=="045e", ATTRS{idProduct}=="097e", MODE="0666", GROUP="plugdev"
 
 LABEL="k4a_logic_rules_end"
 ```
+> Replace source file for Azure_Kinect_ROS_Driver with the one provided in config folder and replace config yaml files for the dlio and elevation mapping cupy with the one provided in respective folder 
 
 ### Build and source
 
@@ -83,6 +88,15 @@ In terminal 2: cd catkin_ws/src/navstack_pub/src; python3 action_generator.py
 
 > All training data can be found at [GMU Dataverse](https://dataverse.orc.gmu.edu/dataset.xhtml?persistentId=doi:10.13021/orc2020/QSN50Q)
 
+### WM-VCT Planner
+
+```
+Launch packages
+In terminal 1: roslaunch navstack_pub runCAR_all.launch
+
+Launch planner
+In terminal 2: cd catkin_ws/src/WM-VCT; python3 CustromPlanner.py
+```
 
 ### Verti-Wheelers Control Interface with PS4 Controller
 ![Suite image](https://github.com/RobotiXX/Verti-Wheelers/blob/main/Joystick%20control.jpg)
