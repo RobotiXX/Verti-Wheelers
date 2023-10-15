@@ -25,7 +25,7 @@ SOFTWARE.
 
 import rospy
 import tf
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, TwistStamped
 from geometry_msgs.msg import Quaternion
 from sensor_msgs.msg import Imu
 from std_msgs.msg import String
@@ -36,7 +36,8 @@ import sys
 import os
 import time
 from threading import Lock
-
+import math
+import numpy as np
 
 class twistControl(object):
     def __init__(self):
@@ -64,7 +65,7 @@ class twistControl(object):
 
         #Control Command to Arduino (format dataindex: fuction)
         #[0:steering 1:throttle 2:arm-Disarm 3:gear 4:frontDiffLock 5:RearDiffLock 6:cameraServo]
-        self.control_cmd = Float32MultiArray( data=[ 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0 ] )  
+        self.control_cmd = Float32MultiArray( data=[ 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.28 ] )  
         
         #Camera Pose variables
         self.roll = 0.0
@@ -78,32 +79,38 @@ class twistControl(object):
         self.i = 0.0
         self.d = 0.0
         self.prv_ae = 0
-        self.acc_ae = 0
+        self.ang_integral_error = 0
+        self.out_ang = 0
         
         print("cmd_control")
 
-        rospy.Subscriber("/cmd_vel", Twist, self.navStackCB, queue_size=5)
+        rospy.Subscriber("/cmd_vel", Twist, self.navStackCB, queue_size=1)
         rospy.Subscriber("/campose", Float32MultiArray, self.camCB, queue_size=1)
         rospy.Subscriber("/joy", Joy, self.joyControlCB, queue_size=1)
         self.vel_pub1 = rospy.Publisher("/cmd_vel1", Float32MultiArray, queue_size=1)
         rospy.init_node("cmd_control", anonymous=True)
-        rate = rospy.Rate(80)
+        rate = rospy.Rate(40)
         while not rospy.is_shutdown():
             self.cmdRouter()
             rate.sleep()
 
     def navStackCB(self, navCmd):
         try:
-            self.nav_cmd = navCmd
+            #self.nav_cmd = navCmd.twist
             if self.automode and self.armed:
-            	#Throttle command from navigation stack
-            	self.control_cmd.data[1] = navCmd.linear.x * self.thr_mul
-
-            	#Steering command from navigation stack
-            	self.control_cmd.data[0] = navCmd.angular.z * self.str_mul
-            self.navtime = time.time()
+                #Throttle command from navigation stack
+                self.control_cmd.data[1] = navCmd.linear.x * self.thr_mul
+                #Steering command from navigation stack
+                self.control_cmd.data[0] = navCmd.angular.z * self.str_mul
+                self.navtime = time.time()
         except (Exception, b):
             print(b)
+	
+    def translate(self, value, leftMin, leftMax, rightMin, rightMax):
+        leftSpan = leftMax - leftMin
+        rightSpan = rightMax - rightMin
+        valueScaled = float(value - leftMin) / float(leftSpan)
+        return rightMin + (valueScaled * rightSpan)
 
     def camCB(self, cam):
         try:
@@ -113,22 +120,31 @@ class twistControl(object):
             self.p = cam.data[3]
             self.i = cam.data[4]
             self.d = cam.data[5]
-
             k = cam.data[6]
-            ae = self.set_pitch - self.pitch
-            if(abs(ae) < 0.15):
-                ae = 0
-                self.acc_ae= 0
-            ae_chg = self.prv_ae - ae
-            self.prv_ae = ae
-            self.acc_ae += ae 
-            ae_inc = (self.p * ae/2) + (self.i * (self.acc_ae)) - (self.d * (ae_chg))
-            self.control_cmd.data[6] = self.control_cmd.data[6] + ae_inc / k
+
+            ang_error = self.set_pitch - self.pitch
+            if(abs(ang_error) < 0.2):
+                ang_error = 0
+
+            self.ang_integral_error += ang_error
+            self.ang_integral_error = min(100, max(-15, self.ang_integral_error ))
+            ang_derivative_error = self.prv_ae - ang_error
+
+            self.prv_ae = ang_error
+
+            self.out_ang = self.out_ang + (self.p * ang_error ) + (self.i * (self.ang_integral_error)) - (self.d * ang_derivative_error)
+            self.out_ang = min(28, max(-5, self.out_ang ))
+
+            out = self.translate(self.out_ang, -5, 28, 0, 1)
+            print(out)
+            #ae_inc = self.translate(ae_inc, -74, 74, 0, 1)
+            self.control_cmd.data[6] = out
+
             if self.control_cmd.data[6] > 1.0:
-            	self.control_cmd.data[6]= 1.0
+                self.control_cmd.data[6]= 1.0
                 #pass
             if self.control_cmd.data[6] < 0.0:
-            	self.control_cmd.data[6] = 0.0
+                self.control_cmd.data[6] = 0.0
                 #pass
         except (Exception, b):
             print(b)
@@ -150,7 +166,7 @@ class twistControl(object):
                     self.throttleInitialized = False
                     self.armed = False
                     self.automode = False 
-                    self.control_cmd.data = [ 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0 ]
+                    self.control_cmd.data = [ 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.28 ]
                     print("Vehicle Disarmed")
 
             #Joy control loop
@@ -175,7 +191,7 @@ class twistControl(object):
                     #throttle Control reverse    
                     if self.joystick.axes[4] == -1:
                         self.throttle = -((1 - self.joystick.axes[5])/2)*((1 - self.joystick.axes[5])/2)
-                        self.control_cmd.data[1] = self.throttle   
+                        self.control_cmd.data[1] = self.throttle  
                 
 
                 #Gear Hi-Low
@@ -221,6 +237,7 @@ class twistControl(object):
                 self.camangle = self.camangle + self.joystick.axes[7]
                 if self.joystick.buttons[10] == 1:
                     self.camangle = self.def_pitch
+                    print("Camera angle: " + str(self.camangle) )
                     
                 
                 self.control_cmd.data[3] = self.gear
@@ -270,8 +287,7 @@ class twistControl(object):
          
         else:
             #if disArmed then pass default values
-            self.control_cmd.data = [ -1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0 ]
-            self.vel_pub1.publish(self.control_cmd)
+            self.control_cmd.data = [ -1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.28]
             self.automode = False
             self.armed = False
 
